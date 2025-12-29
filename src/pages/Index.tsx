@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
@@ -93,59 +92,54 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">FITCLUB</h1>
-            <div className="flex gap-8">
-              {[
-                { id: 'trainers', label: 'Тренеры' },
-                { id: 'services', label: 'Услуги' },
-                { id: 'schedule', label: 'Расписание' }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors ${
-                    activeSection === item.id ? 'text-primary' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1100px] mx-auto bg-card rounded-md shadow-sm p-5 mt-5">
+        <nav className="mb-4 pb-2 border-b border-border">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-2xl font-semibold text-foreground">FITCLUB</h1>
           </div>
-        </div>
-      </nav>
+          <div className="flex gap-3">
+            {[
+              { id: 'trainers', label: 'Тренеры' },
+              { id: 'services', label: 'Услуги' },
+              { id: 'schedule', label: 'Расписание' }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`px-3 py-1.5 rounded text-sm transition-colors ${
+                  activeSection === item.id 
+                    ? 'bg-accent text-accent-foreground' 
+                    : 'text-primary hover:bg-accent/50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </nav>
 
-      <section className="pt-32 pb-24 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-7xl font-bold text-gray-900 mb-6 leading-tight">
-            Преврати тело<br />в произведение искусства
+        <section className="py-8 text-center">
+          <h2 className="text-3xl font-semibold text-foreground mb-3">
+            Преврати тело в произведение искусства
           </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-sm text-muted-foreground mb-5 max-w-2xl mx-auto">
             Современный фитнес-клуб с профессиональными тренерами и индивидуальным подходом к каждому клиенту
           </p>
           <Button 
-            size="lg" 
-            className="text-lg px-8 py-6 h-auto"
             onClick={() => setIsScheduleModalOpen(true)}
+            className="text-sm"
           >
             Записаться на тренировку
           </Button>
-        </div>
-      </section>
+        </section>
 
-      <section id="trainers" className="py-24 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">Наши тренеры</h2>
-            <p className="text-lg text-gray-600">Профессионалы с многолетним опытом</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section id="trainers" className="py-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">Наши тренеры</h2>
+          <p className="text-sm text-muted-foreground mb-5">Профессионалы с многолетним опытом</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {trainers.map((trainer) => (
-              <Card key={trainer.id} className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={trainer.id} className="overflow-hidden shadow-sm border border-border">
                 <div className="aspect-square overflow-hidden">
                   <img 
                     src={trainer.image} 
@@ -153,132 +147,127 @@ const Index = () => {
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{trainer.name}</h3>
-                  <p className="text-primary font-medium mb-2">{trainer.specialization}</p>
-                  <p className="text-sm text-gray-600">{trainer.experience}</p>
+                <CardContent className="p-4">
+                  <h3 className="text-base font-semibold text-foreground mb-1">{trainer.name}</h3>
+                  <p className="text-sm text-primary mb-1">{trainer.specialization}</p>
+                  <p className="text-xs text-muted-foreground">{trainer.experience}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="services" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">Услуги</h2>
-            <p className="text-lg text-gray-600">Выбери программу под свои цели</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section id="services" className="py-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">Услуги</h2>
+          <p className="text-sm text-muted-foreground mb-5">Выбери программу под свои цели</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {services.map((service, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow p-8">
+              <Card key={index} className="shadow-sm border border-border p-4">
                 <CardContent className="p-0">
-                  <div className="flex items-start gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Icon name={service.icon as any} size={32} className="text-primary" />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded bg-accent flex items-center justify-center flex-shrink-0">
+                      <Icon name={service.icon as any} size={24} className="text-accent-foreground" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">{service.title}</h3>
-                      <p className="text-gray-600 mb-4">{service.description}</p>
-                      <Badge variant="secondary" className="text-base px-4 py-1">
+                      <h3 className="text-base font-semibold text-foreground mb-2">{service.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
+                      <div className="inline-block px-3 py-1 bg-secondary rounded text-xs text-secondary-foreground font-medium">
                         {service.price}
-                      </Badge>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="schedule" className="py-24 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">Расписание</h2>
-            <p className="text-lg text-gray-600">Выбери удобное время для тренировки</p>
-          </div>
+        <section id="schedule" className="py-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">Расписание</h2>
+          <p className="text-sm text-muted-foreground mb-5">Выбери удобное время для тренировки</p>
           
-          <div className="flex gap-3 mb-8 flex-wrap">
+          <div className="flex gap-2 mb-4 flex-wrap">
             {days.map((day) => (
               <Button
                 key={day}
                 variant={selectedDay === day ? 'default' : 'outline'}
                 onClick={() => setSelectedDay(day)}
-                className="text-base"
+                size="sm"
+                className="text-xs"
               >
                 {day}
               </Button>
             ))}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filteredSchedule.map((item, index) => (
-              <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+              <Card key={index} className="shadow-sm border border-border">
+                <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900">{item.time}</div>
+                        <div className="text-xl font-semibold text-foreground">{item.time}</div>
                       </div>
-                      <div className="h-12 w-px bg-gray-200"></div>
+                      <div className="h-10 w-px bg-border"></div>
                       <div>
-                        <h4 className="text-xl font-bold text-gray-900 mb-1">{item.activity}</h4>
-                        <p className="text-gray-600">{item.trainer}</p>
+                        <h4 className="text-sm font-semibold text-foreground mb-0.5">{item.activity}</h4>
+                        <p className="text-xs text-muted-foreground">{item.trainer}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Icon name="Users" size={20} />
+                        <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                          <Icon name="Users" size={16} />
                           <span>{item.spots} мест</span>
                         </div>
                       </div>
-                      <Button onClick={() => {
-                        setSelectedTrainerForSchedule(item.trainer);
-                        setIsScheduleModalOpen(true);
-                      }}>Записаться</Button>
+                      <Button 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedTrainerForSchedule(item.trainer);
+                          setIsScheduleModalOpen(true);
+                        }}
+                      >
+                        Записаться
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <footer className="py-12 px-6 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4">FITCLUB</h3>
-          <p className="text-gray-400">© 2024 Все права защищены</p>
-        </div>
-      </footer>
+        <footer className="mt-8 pt-4 border-t border-border text-center">
+          <p className="text-xs text-muted-foreground">© 2024 FITCLUB. Все права защищены</p>
+        </footer>
+      </div>
 
       <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Расписание</DialogTitle>
-            <p className="text-sm text-muted-foreground">Свободные и занятые окошки</p>
+            <DialogTitle className="text-xl font-semibold">Расписание</DialogTitle>
+            <p className="text-xs text-muted-foreground">Свободные и занятые окошки</p>
           </DialogHeader>
-          <div className="space-y-4 mt-6">
+          <div className="space-y-3 mt-4">
             {[
               { date: '27 дек.', day: 'Сб', time: '13:00', spots: 0, total: 1 },
               { date: '30 дек.', day: 'Вт', time: '14:00', spots: 0, total: 1 }
             ].map((slot, index) => (
-              <Card key={index} className="bg-gray-50 border-0">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+              <Card key={index} className="bg-muted border-0">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <div className="text-lg font-semibold text-gray-900">{slot.date}</div>
-                      <div className="text-sm text-gray-600">{slot.day}</div>
+                      <div className="text-base font-semibold text-foreground">{slot.date}</div>
+                      <div className="text-xs text-muted-foreground">{slot.day}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium text-green-600">{slot.spots} свободно</div>
-                      <div className="text-xs text-gray-500">из {slot.total}</div>
+                      <div className="text-xs font-medium text-green-600">{slot.spots} свободно</div>
+                      <div className="text-xs text-muted-foreground">из {slot.total}</div>
                     </div>
                   </div>
-                  <div className="text-base text-gray-700">{slot.time}</div>
+                  <div className="text-sm text-foreground">{slot.time}</div>
                 </CardContent>
               </Card>
             ))}
