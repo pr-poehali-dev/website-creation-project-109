@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
 const trainers = [
@@ -79,6 +80,8 @@ const schedule = [
 const Index = () => {
   const [activeSection, setActiveSection] = useState('trainers');
   const [selectedDay, setSelectedDay] = useState('Понедельник');
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [selectedTrainerForSchedule, setSelectedTrainerForSchedule] = useState<string | null>(null);
 
   const days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
   const filteredSchedule = schedule.filter(item => item.day === selectedDay);
@@ -124,7 +127,11 @@ const Index = () => {
           <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Современный фитнес-клуб с профессиональными тренерами и индивидуальным подходом к каждому клиенту
           </p>
-          <Button size="lg" className="text-lg px-8 py-6 h-auto">
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-6 h-auto"
+            onClick={() => setIsScheduleModalOpen(true)}
+          >
             Записаться на тренировку
           </Button>
         </div>
@@ -228,7 +235,10 @@ const Index = () => {
                           <span>{item.spots} мест</span>
                         </div>
                       </div>
-                      <Button>Записаться</Button>
+                      <Button onClick={() => {
+                        setSelectedTrainerForSchedule(item.trainer);
+                        setIsScheduleModalOpen(true);
+                      }}>Записаться</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -244,6 +254,37 @@ const Index = () => {
           <p className="text-gray-400">© 2024 Все права защищены</p>
         </div>
       </footer>
+
+      <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Расписание</DialogTitle>
+            <p className="text-sm text-muted-foreground">Свободные и занятые окошки</p>
+          </DialogHeader>
+          <div className="space-y-4 mt-6">
+            {[
+              { date: '27 дек.', day: 'Сб', time: '13:00', spots: 0, total: 1 },
+              { date: '30 дек.', day: 'Вт', time: '14:00', spots: 0, total: 1 }
+            ].map((slot, index) => (
+              <Card key={index} className="bg-gray-50 border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <div className="text-lg font-semibold text-gray-900">{slot.date}</div>
+                      <div className="text-sm text-gray-600">{slot.day}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-green-600">{slot.spots} свободно</div>
+                      <div className="text-xs text-gray-500">из {slot.total}</div>
+                    </div>
+                  </div>
+                  <div className="text-base text-gray-700">{slot.time}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
