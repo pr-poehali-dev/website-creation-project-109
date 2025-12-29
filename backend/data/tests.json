@@ -1,0 +1,57 @@
+{
+  "tests": [
+    {
+      "name": "Get trainers list",
+      "method": "GET",
+      "path": "/?type=trainers",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "0": {
+          "id": "number",
+          "name": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get subscriptions list",
+      "method": "GET",
+      "path": "/?type=subscriptions",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "0": {
+          "id": "number",
+          "title": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get activities list",
+      "method": "GET",
+      "path": "/?type=activities",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "0": {
+          "id": "number",
+          "title": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get schedule",
+      "method": "GET",
+      "path": "/?type=schedule",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "0": {
+          "id": "number",
+          "day_of_week": "string",
+          "activity_title": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,95 +1,91 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
-const trainers = [
-  {
-    id: 1,
-    name: 'Алексей Волков',
-    specialization: 'Силовые тренировки',
-    experience: '8 лет опыта',
-    image: 'https://images.unsplash.com/photo-1567013544450-38549c4b0290?w=400&h=400&fit=crop'
-  },
-  {
-    id: 2,
-    name: 'Мария Соколова',
-    specialization: 'Йога и стретчинг',
-    experience: '6 лет опыта',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop'
-  },
-  {
-    id: 3,
-    name: 'Дмитрий Петров',
-    specialization: 'Функциональный тренинг',
-    experience: '10 лет опыта',
-    image: 'https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=400&h=400&fit=crop'
-  },
-  {
-    id: 4,
-    name: 'Елена Новикова',
-    specialization: 'Пилатес и кардио',
-    experience: '7 лет опыта',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop'
-  }
-];
+interface Trainer {
+  id: number;
+  name: string;
+  specialization: string;
+  experience: string;
+  image_url: string;
+  bio: string;
+}
 
-const services = [
-  {
-    icon: 'Dumbbell',
-    title: 'Персональные тренировки',
-    description: 'Индивидуальные программы с тренером под ваши цели',
-    price: 'от 2 500 ₽'
-  },
-  {
-    icon: 'Users',
-    title: 'Групповые занятия',
-    description: 'Йога, пилатес, функциональный тренинг в мини-группах',
-    price: 'от 800 ₽'
-  },
-  {
-    icon: 'Heart',
-    title: 'Фитнес-программы',
-    description: 'Комплексные программы для похудения и набора массы',
-    price: 'от 5 000 ₽'
-  },
-  {
-    icon: 'Apple',
-    title: 'Консультации по питанию',
-    description: 'Индивидуальный план питания от нутрициолога',
-    price: 'от 3 000 ₽'
-  }
-];
+interface Subscription {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  duration: string;
+  features: string[];
+}
 
-const schedule = [
-  { day: 'Понедельник', time: '09:00', activity: 'Йога', trainer: 'Мария Соколова', spots: 12 },
-  { day: 'Понедельник', time: '11:00', activity: 'Силовая тренировка', trainer: 'Алексей Волков', spots: 8 },
-  { day: 'Понедельник', time: '18:00', activity: 'Функциональный тренинг', trainer: 'Дмитрий Петров', spots: 10 },
-  { day: 'Вторник', time: '10:00', activity: 'Пилатес', trainer: 'Елена Новикова', spots: 15 },
-  { day: 'Вторник', time: '19:00', activity: 'Йога', trainer: 'Мария Соколова', spots: 12 },
-  { day: 'Среда', time: '09:00', activity: 'Силовая тренировка', trainer: 'Алексей Волков', spots: 8 },
-  { day: 'Среда', time: '17:00', activity: 'Функциональный тренинг', trainer: 'Дмитрий Петров', spots: 10 },
-  { day: 'Четверг', time: '11:00', activity: 'Пилатес', trainer: 'Елена Новикова', spots: 15 },
-  { day: 'Четверг', time: '18:30', activity: 'Йога', trainer: 'Мария Соколова', spots: 12 },
-  { day: 'Пятница', time: '10:00', activity: 'Силовая тренировка', trainer: 'Алексей Волков', spots: 8 },
-  { day: 'Пятница', time: '19:00', activity: 'Функциональный тренинг', trainer: 'Дмитрий Петров', spots: 10 }
-];
+interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface ScheduleItem {
+  id: number;
+  day_of_week: string;
+  time_start: string;
+  activity_title: string;
+  trainer_name: string;
+  max_spots: number;
+}
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('trainers');
   const [selectedDay, setSelectedDay] = useState('Понедельник');
-  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [selectedTrainerForSchedule, setSelectedTrainerForSchedule] = useState<string | null>(null);
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
-  const filteredSchedule = schedule.filter(item => item.day === selectedDay);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [trainersRes, subsRes, activitiesRes, scheduleRes] = await Promise.all([
+          fetch('/api/data?type=trainers').then(r => r.json()),
+          fetch('/api/data?type=subscriptions').then(r => r.json()),
+          fetch('/api/data?type=activities').then(r => r.json()),
+          fetch('/api/data?type=schedule').then(r => r.json())
+        ]);
+
+        setTrainers(trainersRes);
+        setSubscriptions(subsRes);
+        setActivities(activitiesRes);
+        setSchedule(scheduleRes);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredSchedule = schedule.filter(item => item.day_of_week === selectedDay);
 
   const scrollToSection = (section: string) => {
     setActiveSection(section);
     const element = document.getElementById(section);
     element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Загрузка...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,10 +94,11 @@ const Index = () => {
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-2xl font-semibold text-foreground">FITCLUB</h1>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {[
               { id: 'trainers', label: 'Тренеры' },
-              { id: 'services', label: 'Услуги' },
+              { id: 'subscriptions', label: 'Тарифы' },
+              { id: 'activities', label: 'Занятия' },
               { id: 'schedule', label: 'Расписание' }
             ].map((item) => (
               <button
@@ -119,19 +116,16 @@ const Index = () => {
           </div>
         </nav>
 
-        <section className="py-8 text-center">
-          <h2 className="text-3xl font-semibold text-foreground mb-3">
-            Преврати тело в произведение искусства
+        <section className="py-8">
+          <h2 className="text-3xl font-semibold text-foreground mb-3 text-center">
+            Добро пожаловать в FITCLUB
           </h2>
-          <p className="text-sm text-muted-foreground mb-5 max-w-2xl mx-auto">
-            Современный фитнес-клуб с профессиональными тренерами и индивидуальным подходом к каждому клиенту
+          <p className="text-sm text-muted-foreground mb-2 text-center max-w-2xl mx-auto">
+            Современный фитнес-клуб с профессиональными тренерами и индивидуальным подходом.
           </p>
-          <Button 
-            onClick={() => setIsScheduleModalOpen(true)}
-            className="text-sm"
-          >
-            Записаться на тренировку
-          </Button>
+          <p className="text-sm text-muted-foreground text-center max-w-2xl mx-auto">
+            Для записи на занятия обратитесь к администратору клуба.
+          </p>
         </section>
 
         <section id="trainers" className="py-8">
@@ -142,38 +136,63 @@ const Index = () => {
               <Card key={trainer.id} className="overflow-hidden shadow-sm border border-border">
                 <div className="aspect-square overflow-hidden">
                   <img 
-                    src={trainer.image} 
+                    src={trainer.image_url} 
                     alt={trainer.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <CardContent className="p-4">
                   <h3 className="text-base font-semibold text-foreground mb-1">{trainer.name}</h3>
                   <p className="text-sm text-primary mb-1">{trainer.specialization}</p>
-                  <p className="text-xs text-muted-foreground">{trainer.experience}</p>
+                  <p className="text-xs text-muted-foreground mb-2">{trainer.experience}</p>
+                  {trainer.bio && <p className="text-xs text-muted-foreground">{trainer.bio}</p>}
                 </CardContent>
               </Card>
             ))}
           </div>
         </section>
 
-        <section id="services" className="py-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">Услуги</h2>
-          <p className="text-sm text-muted-foreground mb-5">Выбери программу под свои цели</p>
+        <section id="subscriptions" className="py-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">Тарифы и подписки</h2>
+          <p className="text-sm text-muted-foreground mb-5">Выберите подходящий тариф</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {subscriptions.map((sub) => (
+              <Card key={sub.id} className="shadow-sm border border-border p-4">
+                <CardContent className="p-0">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{sub.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{sub.description}</p>
+                  <div className="mb-3">
+                    <span className="text-2xl font-bold text-primary">{sub.price}</span>
+                    {sub.duration && <span className="text-xs text-muted-foreground ml-1">/ {sub.duration}</span>}
+                  </div>
+                  <ul className="space-y-2">
+                    {sub.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-xs">
+                        <Icon name="Check" size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section id="activities" className="py-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">Виды занятий</h2>
+          <p className="text-sm text-muted-foreground mb-5">Разнообразные программы тренировок</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {services.map((service, index) => (
-              <Card key={index} className="shadow-sm border border-border p-4">
+            {activities.map((activity) => (
+              <Card key={activity.id} className="shadow-sm border border-border p-4">
                 <CardContent className="p-0">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded bg-accent flex items-center justify-center flex-shrink-0">
-                      <Icon name={service.icon as any} size={24} className="text-accent-foreground" />
+                      <Icon name={activity.icon as any} size={24} className="text-accent-foreground" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-foreground mb-2">{service.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
-                      <div className="inline-block px-3 py-1 bg-secondary rounded text-xs text-secondary-foreground font-medium">
-                        {service.price}
-                      </div>
+                      <h3 className="text-base font-semibold text-foreground mb-2">{activity.title}</h3>
+                      <p className="text-sm text-muted-foreground">{activity.description}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -183,59 +202,67 @@ const Index = () => {
         </section>
 
         <section id="schedule" className="py-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">Расписание</h2>
-          <p className="text-sm text-muted-foreground mb-5">Выбери удобное время для тренировки</p>
+          <h2 className="text-xl font-semibold text-foreground mb-3">Расписание занятий</h2>
+          <p className="text-sm text-muted-foreground mb-5">Выберите день недели</p>
           
           <div className="flex gap-2 mb-4 flex-wrap">
             {days.map((day) => (
-              <Button
+              <button
                 key={day}
-                variant={selectedDay === day ? 'default' : 'outline'}
                 onClick={() => setSelectedDay(day)}
-                size="sm"
-                className="text-xs"
+                className={`px-3 py-1.5 rounded text-xs transition-colors ${
+                  selectedDay === day 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
               >
                 {day}
-              </Button>
+              </button>
             ))}
           </div>
 
           <div className="space-y-3">
-            {filteredSchedule.map((item, index) => (
-              <Card key={index} className="shadow-sm border border-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="text-xl font-semibold text-foreground">{item.time}</div>
-                      </div>
-                      <div className="h-10 w-px bg-border"></div>
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-0.5">{item.activity}</h4>
-                        <p className="text-xs text-muted-foreground">{item.trainer}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
-                          <Icon name="Users" size={16} />
-                          <span>{item.spots} мест</span>
+            {filteredSchedule.length > 0 ? (
+              filteredSchedule.map((item) => (
+                <Card key={item.id} className="shadow-sm border border-border">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="text-center min-w-[60px]">
+                          <div className="text-xl font-semibold text-foreground">{item.time_start}</div>
+                        </div>
+                        <div className="h-10 w-px bg-border"></div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-foreground mb-0.5">{item.activity_title}</h4>
+                          <p className="text-xs text-muted-foreground">{item.trainer_name}</p>
                         </div>
                       </div>
-                      <Button 
-                        size="sm"
-                        onClick={() => {
-                          setSelectedTrainerForSchedule(item.trainer);
-                          setIsScheduleModalOpen(true);
-                        }}
-                      >
-                        Записаться
-                      </Button>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                          <Icon name="Users" size={14} />
+                          <span>До {item.max_spots} человек</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">На этот день занятий не запланировано</p>
+            )}
+          </div>
+        </section>
+
+        <section className="py-6 mt-4 border-t border-border">
+          <div className="text-center">
+            <h3 className="text-base font-semibold text-foreground mb-2">Как получить доступ?</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Посетите наш фитнес-клуб, и администратор оформит вам карту клиента
+            </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent rounded text-sm">
+              <Icon name="MapPin" size={16} className="text-accent-foreground" />
+              <span className="text-accent-foreground">ул. Спортивная, 15 • пн-вс 7:00-23:00</span>
+            </div>
           </div>
         </section>
 
@@ -243,37 +270,6 @@ const Index = () => {
           <p className="text-xs text-muted-foreground">© 2024 FITCLUB. Все права защищены</p>
         </footer>
       </div>
-
-      <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Расписание</DialogTitle>
-            <p className="text-xs text-muted-foreground">Свободные и занятые окошки</p>
-          </DialogHeader>
-          <div className="space-y-3 mt-4">
-            {[
-              { date: '27 дек.', day: 'Сб', time: '13:00', spots: 0, total: 1 },
-              { date: '30 дек.', day: 'Вт', time: '14:00', spots: 0, total: 1 }
-            ].map((slot, index) => (
-              <Card key={index} className="bg-muted border-0">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <div className="text-base font-semibold text-foreground">{slot.date}</div>
-                      <div className="text-xs text-muted-foreground">{slot.day}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs font-medium text-green-600">{slot.spots} свободно</div>
-                      <div className="text-xs text-muted-foreground">из {slot.total}</div>
-                    </div>
-                  </div>
-                  <div className="text-sm text-foreground">{slot.time}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
