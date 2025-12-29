@@ -50,11 +50,13 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const API_URL = 'https://functions.poehali.dev/050f9cdb-68db-4000-9fac-e1d4caf1ae0b';
+        
         const [trainersRes, subsRes, activitiesRes, scheduleRes] = await Promise.all([
-          fetch('/api/data?type=trainers').then(r => r.json()),
-          fetch('/api/data?type=subscriptions').then(r => r.json()),
-          fetch('/api/data?type=activities').then(r => r.json()),
-          fetch('/api/data?type=schedule').then(r => r.json())
+          fetch(`${API_URL}?type=trainers`).then(r => r.json()),
+          fetch(`${API_URL}?type=subscriptions`).then(r => r.json()),
+          fetch(`${API_URL}?type=activities`).then(r => r.json()),
+          fetch(`${API_URL}?type=schedule`).then(r => r.json())
         ]);
 
         setTrainers(trainersRes);
